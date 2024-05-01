@@ -1,0 +1,24 @@
+{
+  "name": "cypress-with-kafka",
+  "version": "1.0.0",
+  "description": "Exemplo de uso do Cypress com Kafka",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CrisJacques/cypress-with-kafka.git"
+  },
+  "author": "Cristhiane Jacques",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CrisJacques/cypress-with-kafka/issues"
+  },
+  "homepage": "https://github.com/CrisJacques/cypress-with-kafka#readme",
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "cypress": "^13.8.1",
+    "kafkajs": "^2.2.4"
+  }
+}
