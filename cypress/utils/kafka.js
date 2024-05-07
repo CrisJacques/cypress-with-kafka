@@ -70,7 +70,7 @@ async function consume(topic){
 
     await consumer.subscribe({
         topic,
-        fromBeginning: true
+        fromBeginning: false
     })
 
     await consumer.run({
