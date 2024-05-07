@@ -2,6 +2,35 @@ const {Kafka, logLevel} = require("kafkajs")
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 const brokers = ["localhost:19092"]
+let producer
+let consumer
+
+/**
+ * Cria e retorna um produtor ou consumidor do Kafka pronto para uso
+ * @param {String} topicName - Nome do tópico de interesse
+ * @param {String} connectionType - Tipo de conexão ('producer' ou 'consumer')
+ * @returns 
+ */
+async function kafkaConnect(topicName, connectionType){
+    const kafka = new Kafka({
+        clientId: 'cypress-' + topicName,
+        brokers,
+        logLevel: logLevel.INFO
+    })
+
+    if (connectionType == 'producer'){
+        producer = kafka.producer()
+        await producer.connect()
+    }
+    else if (connectionType == 'consumer'){
+        consumer = kafka.consumer({groupId: "cypressGroup-" + topicName})
+        await consumer.connect()
+    }
+    else{
+        console.log("Parâmetro connectionType com valor não esperado (utilize 'producer' ou 'consumer')")
+    }
+}
+
 
 /**
  * Produz uma mensagem no tópico passado por parâmetro
@@ -9,12 +38,6 @@ const brokers = ["localhost:19092"]
  * @param {String} topicName  - Nome do tópico
  */
 async function produce(messageJson, topicName){
-    const kafka = new Kafka({
-        clientId: "cypress-" + topicName,
-        brokers,
-        logLevel: logLevel.INFO
-    })
-
     const messageData = () => {
         return {
             key: 'key',
@@ -22,9 +45,8 @@ async function produce(messageJson, topicName){
         }
     }
 
-    const producer = kafka.producer()
-    await producer.connect()
-
+    await kafkaConnect(topicName, 'producer')
+    
     await producer.send({
         topic: topicName,
         messages: [messageData()]
@@ -44,17 +66,8 @@ async function produce(messageJson, topicName){
 async function consume(topic){
     let responseData = [];
 
-    const kafka = new Kafka({
-        clientId: "cypress-" + topic,
-        brokers,
-        logLevel: logLevel.INFO
-    })
+    await kafkaConnect(topic, 'consumer')
 
-    const consumer = kafka.consumer({
-        groupId: "cypressGroup-" + topic
-    })
-
-    await consumer.connect()
     await consumer.subscribe({
         topic,
         fromBeginning: true
